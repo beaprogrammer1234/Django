@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% extends 'blog/base.html' %}
+{% block title_block %} {{post.title}} {% endblock %}
+{% block content %}
+    <h1>{{post.title}}</h1>
+    <p id="date">published on {{post.publish}} by {{post.author|title}}</P>
+        {{post.body|linebreaks}}<br><br>
+    <div class="container" align="center">
+    <a href="/{{post.id}}/share" class="btn btn-primary" >Share post by email</a> <!-- 'post' object is created in views.py -->
+<!-- href always expects url pattern. its post id here. if we add 'Target=__blank' - opens in new tab -->
+    </div>
+    {% with comments.count as comments_count %}
+<!-- assign this 'comments.count' call to variable comments_count. This is to avoid multiple count calls from DB-->
+    <h3>{{comments_count}} Comment{{comments_count|pluralize}}</h3>
+    {% endwith %}
+    {% if comments %}
+        {%for comment in comments%}
+            <p id="ch">Comment {{forloop.counter}} by {{comment.name}} on {{comment.created}}</p>
+            <div class="cb">{{comment.body|linebreaks}}</div>
+        {% endfor %}
+    {% else %}
+        <p>There are no comments yet</p>
+    {% endif %}
+    {% if csubmit %} <!-- if comment submitted -->
+        <h2>Your comment added successfully</h2>
+    {% else %} <!-- else display the form -->
+        <form method="post">
+            {{form.as_p}}
+            {% csrf_token %}
+            <input type="submit" name="" value="submit comment">
+        </form>
+    {% endif %}
+{% endblock %}
